@@ -14,7 +14,7 @@ This project has three main goals:
 2. Reduce the amount of configuration required for great auth.
 3. Enable automation of RBAC configuration updates with CI/CD.
 
-**Want to learn more?** Fairwinds holds [office hours on Zoom](https://zoom.us/j/242508205) the first Friday of every month, at 12pm Eastern. You can also reach out via email at `opensource@fairwinds.com`
+**Want to learn more?** Reach out on [the Slack channel](https://fairwindscommunity.slack.com/messages/rbac-projects), send an email to `opensource@fairwinds.com`, or join us for [office hours on Zoom](https://fairwindscommunity.slack.com/messages/office-hours)
 
 ## An Example
 To fully understand how RBAC Manager works, it's helpful to walk through a simple example. In this example we'll have a single user, Joe, that needs `edit` access to the `web` namespace and `view` access to `api` namespace.
@@ -117,6 +117,16 @@ rbacBindings:
 ```
 
 In the example above, Role Bindings would automatically get created for each Namespace with a `team=dev` label. This supports the same functionality as other Kubernetes label selectors, read the [official docs](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) for more information.
+
+## ServiceAccounts
+
+If an `RBACDefinition` defines a `ServiceAccount` as a subject, rbac-manager will attempt to create the `ServiceAccount` for you. **WARNING**: When an `RBACDefinition` owns a `ServiceAccount` in this fashion, it will be deleted when the `RBACDefinition` is deleted.
+
+### ImagePullSecrets and ServiceAccounts
+
+Service accounts support adding `ImagePullSecrets` to their definition. What happens is that when a `Pod` (via `Deployment` or otherwise) is launched specifying a `ServiceAccount` that specifies `ImagePullSecrets`, the pull secrets will be injected into the Pod spec automatically. An example of this using rbac-manager [can be found in the examples directory](examples/rbacdefinition-sa-imagepull.yaml).
+
+Please note: rbac-manager will not manage secrets, and assumes they are already present in the same namespace that the `ServiceAccount` is in. Also, `ImagePullSecrets` only apply when the `Subject` is a `ServiceAccount`.
 
 ## Contributing
 - [Code of Conduct](CODE_OF_CONDUCT.md)
